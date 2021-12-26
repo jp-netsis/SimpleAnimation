@@ -1,0 +1,12 @@
+{
+  "name": "com.unity.simpleanimationcomponent",
+  "version": "1.0.0",
+  "displayName": "SimpleAnimationComponent",
+  "description": "This is Simple Animation Component package",
+  "unity": "2019.1",
+  "author": {
+    "name": "Unity",
+    "email": "unity@example.com",
+    "url": "https://www.unity3d.com"
+  }
+}
