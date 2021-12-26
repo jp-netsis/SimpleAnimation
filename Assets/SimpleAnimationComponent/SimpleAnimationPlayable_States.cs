@@ -402,6 +402,14 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
 
         private string m_StateName;
 
+        public bool stopped
+        {
+            get => m_stopped;
+            set => m_stopped = value;
+        }
+
+        private bool m_stopped;
+
         public bool fading
         {
             get { return m_Fading; }

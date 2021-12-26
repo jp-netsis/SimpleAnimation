@@ -49,6 +49,10 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
     public Playable playable { get { return self; } }
     protected PlayableGraph graph { get { return self.GetGraph(); } }
 
+    public Action<int> OnAnimationStarted;
+    public Action<int> OnAnimationStopped;
+    public Action<int> OnAnimationCompleted;
+    
     AnimationMixerPlayable m_Mixer;
 
     public System.Action onDone = null;
@@ -182,6 +186,9 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             {
                 state.Enable();
                 state.ForceWeight(1.0f);
+
+                state.stopped = false;
+                OnAnimationStarted?.Invoke(index);
             }
             else
             {
@@ -287,6 +294,12 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         if (!state.isClone)
         {
             RemoveClones(state);
+        }
+
+        if (!state.stopped) //prevent from running twice if game stopped
+        {
+            state.stopped = true;
+            OnAnimationStopped?.Invoke(index);
         }
     }
 
@@ -581,7 +594,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
                 }
             }
 
-            if (state.enabled && state.wrapMode == WrapMode.Once)
+            if (state.enabled && IsClipNonLooping(state.clip))
             {
                 bool stateIsDone = state.isDone;
                 float speed = state.speed;
@@ -597,6 +610,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
                     if (!keepStoppedPlayablesConnected)
                         DisconnectInput(state.index);
 
+                    OnAnimationCompleted?.Invoke(state.index);
                 }
             }
 
@@ -623,6 +637,20 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         }
     }
 
+    private bool IsClipNonLooping(AnimationClip clip)
+    {
+        if (clip.legacy) //legacy clip
+        {
+            return (clip.wrapMode == WrapMode.Once ||
+                    clip.wrapMode == WrapMode.Clamp ||
+                    clip.wrapMode == WrapMode.ClampForever);
+        }
+        else //non-legacy clip
+        {
+            return !clip.isLooping;
+        }
+    }
+    
     private float CalculateQueueTimes()
     {
         float longestTime = -1f;

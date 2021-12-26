@@ -181,6 +181,11 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
     [SerializeField]
     private EditorState[] m_States;
 
+    public SimpleAnimationPlayable Playable
+    {
+        get { return m_Playable; }
+    }
+    
     protected virtual void OnEnable()
     {
         Initialize();
